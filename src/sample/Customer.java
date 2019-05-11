@@ -7,12 +7,12 @@ import java.sql.Statement;
 
 public class Customer {
 
-    User login(String email ,String password){ // returns a User Object if null then there is no user
+    User login(String email , String password){ // returns a User Object if null then there is no user
         User user  = null;
         Statement stmt= null;
         try {
             stmt = SQLConnection.getInstance().getConnection().createStatement();
-            ResultSet rs=stmt.executeQuery("Select * From USER Where email="+email+"AND password="+password+";");
+            ResultSet rs=stmt.executeQuery("Select * From USER Where email='"+email+"' AND password='"+password+"';");
             if(rs.next()) {
                 user = new User(rs.getInt(1), rs.getString(2), rs.getString(3)
                         , rs.getString(4), rs.getString(5), rs.getString(6)
@@ -30,7 +30,7 @@ public class Customer {
         Statement stmt=null;
         try {
             stmt = SQLConnection.getInstance().getConnection().createStatement();
-            ResultSet rs= stmt.executeQuery("Select * From USER Where email=" + email+";");
+            ResultSet rs= stmt.executeQuery("Select * From USER Where email='" + email+"';");
             if(rs.next()) {
                 return false;
             }
@@ -51,11 +51,30 @@ public class Customer {
             registration.setString(7, shippingAddress);
             registration.setString(8, "0");
             if(registration.execute()){
-                return true;
+                return false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return true;
+    }
+
+     User getUser(String email) {
+        String query = "SELECT * FROM USER WHERE EMAIL = '" + email + "';";
+        ResultSet rs = null;
+        User user  = null;
+        try {
+            rs = SQLConnection.getInstance().getData(query);
+            if (rs.next()) {
+                user = new User(rs.getInt(1), rs.getString(2), rs.getString(3)
+                        , rs.getString(4), rs.getString(5), rs.getString(6)
+                        , rs.getString(7), rs.getString(8), rs.getBoolean(9));
+            }
+            rs.close();
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

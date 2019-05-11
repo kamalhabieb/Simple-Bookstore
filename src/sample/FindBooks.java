@@ -40,7 +40,6 @@ public class FindBooks {
         ArrayList<Book> books = new ArrayList<>();
         try {
             ResultSet rs = SQLConnection.getInstance().getData(query);
-            rs.next();
             while (rs.next()) {
                 books.add(constructBook(rs));
             }
@@ -56,7 +55,6 @@ public class FindBooks {
         ArrayList<Book> books = new ArrayList<>();
         try {
             ResultSet rs = SQLConnection.getInstance().getData(query);
-            rs.next();
             while (rs.next()) {
                 books.add(constructBook(rs));
             }
@@ -72,23 +70,22 @@ public class FindBooks {
         ArrayList<Book> books = new ArrayList<>();
         try {
             ResultSet rs = SQLConnection.getInstance().getData(query);
-            rs.next();
             while (rs.next()) {
                 books.add(constructBook(rs));
             }
+            rs.close();
         } catch(Exception e){
             System.out.println(e);
         }
         return books;
     }
 
-    public ArrayList<Book> findByPubYear(int publicationYear){
+    public ArrayList<Book> findByPubYear(String publicationYear){
         String query = "SELECT * FROM BOOK " +
-                "WHERE PUBLICATION_YEAR = " + publicationYear + ";";
+                "WHERE PUBLICATION_YEAR = '" + publicationYear + "';";
         ArrayList<Book> books = new ArrayList<>();
         try {
             ResultSet rs = SQLConnection.getInstance().getData(query);
-            rs.next();
             while (rs.next()) {
                 books.add(constructBook(rs));
             }
@@ -103,7 +100,7 @@ public class FindBooks {
         try {
             book.setIsbn(rs.getString("ISBN"));
             book.setTitle(rs.getString("TITLE"));
-            book.setPublicationYear(Integer.parseInt(rs.getString("PUBLICATION_YEAR")));
+            book.setPublicationYear(rs.getString("PUBLICATION_YEAR"));
             book.setCategoryID(Integer.parseInt(rs.getString("CATEGORY_ID")));
             book.setPublisherID(Integer.parseInt(rs.getString("PUBLISHER_ID")));
             book.setThreshold(Integer.parseInt(rs.getString("THERSHOLD")));

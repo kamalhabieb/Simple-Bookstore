@@ -5,9 +5,9 @@ import java.sql.*;
 public class SQLConnection {
     private static Connection connection = null;
     private static String databaseName=  "ONLINE_BOOK_STORE";
-    private static String databaseURL=  "jdbc:mysql://localhost:3306/"+databaseName;
+    private static String databaseURL=  "jdbc:mysql://127.0.0.1:3306/"+databaseName;
     private static String userName = "root";
-    private static String password = "";
+    private static String password = "TIGER";
     private static SQLConnection connect;
 
     private SQLConnection() {
@@ -34,7 +34,7 @@ public class SQLConnection {
         }
     }
 
-    public ResultSet getData(String query)throws SQLException{
+    public ResultSet getData(String query)throws SQLException {
         Statement stmt=connection.createStatement();
         ResultSet rs=stmt.executeQuery(query);
         return rs;

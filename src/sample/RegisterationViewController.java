@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -29,22 +30,41 @@ public class RegisterationViewController {
     private String str_uName;
     private String str_lName;
 
+    private Customer customer;
+
+    @FXML
+    private void initialize(){
+
+    }
+
+    public void initController(Customer cust, User usr){
+        this.customer = cust;
+    }
+
+
+
     public void regnButtonClicked (ActionEvent event) throws IOException {
 
-        str_address = address.getText().toString();
-        str_email = email.getText().toString();
-        str_fName = fName.getText().toString();
-        str_lName = lName.getText().toString();
-        str_uName = uName.getText().toString();
-        str_password = password.getText().toString();
-        str_phoneNumber = phoneNumber.getText().toString();
+        str_address = address.getText();
+        str_email = email.getText();
+        str_fName = fName.getText();
+        str_lName = lName.getText();
+        str_uName = uName.getText();
+        str_password = password.getText();
+        str_phoneNumber = phoneNumber.getText();
 
-        //todo check reg info
-        //todo if all's good (user created) switch to main view
-        Parent mainViewParent = FXMLLoader.load(getClass().getResource("mainView.fxml"));
-        Scene mainViewScene = new Scene(mainViewParent);
-        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        window.setScene(mainViewScene);
-        window.show();
+        Boolean valid = customer.register(str_uName, str_email,str_fName,str_lName,str_password,str_phoneNumber,str_address);
+
+        if (valid){
+            Parent initViewParent = FXMLLoader.load(getClass().getResource("sample.fxml"));
+            Scene initViewScene = new Scene(initViewParent);
+            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            window.setScene(initViewScene);
+            window.show();
+        }
+        else {
+            //todo show invalid reg
+        }
+
     }
 }

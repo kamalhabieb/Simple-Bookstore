@@ -1,17 +1,14 @@
 package sample;
 
-import java.util.ArrayList;
-
 public class Book {
     private String isbn;
     private String title;
-    private int publicationYear;
+    private String publicationYear;
     private int categoryID;
     private int publisherID;
     private int threshold;
     private float price;
     private int quantity;
-    private ArrayList<String> authorsNames;
 
 //    public Book(String isbn, String title, int publicationYear, int categoryID, int publisherID, int threshold,
 //                float price, int quantity, ArrayList<String> authorsNames) {
@@ -42,11 +39,11 @@ public class Book {
         this.title = title;
     }
 
-    public int getPublicationYear() {
+    public String getPublicationYear() {
         return publicationYear;
     }
 
-    public void setPublicationYear(int publicationYear) {
+    public void setPublicationYear(String publicationYear) {
         this.publicationYear = publicationYear;
     }
 
@@ -90,11 +87,18 @@ public class Book {
         this.quantity = quantity;
     }
 
-    public ArrayList<String> getAuthorsNames() {
-        return authorsNames;
-    }
 
-    public void setAuthorsNames(ArrayList<String> authorsNames) {
-        this.authorsNames = authorsNames;
+    @Override
+    public String toString() {
+        return "Book{" +
+                "isbn='" + isbn + '\'' +
+                ", title='" + title + '\'' +
+                ", publicationYear=" + publicationYear +
+                ", categoryID=" + categoryID +
+                ", publisherID=" + publisherID +
+                ", threshold=" + threshold +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
     }
 }

@@ -1,0 +1,296 @@
+-- -----------------------------------------------------
+-- Schema ONLINE_BOOK_STORE
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema ONLINE_BOOK_STORE
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `ONLINE_BOOK_STORE`;
+USE `ONLINE_BOOK_STORE` ;
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`CATEGORY`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`CATEGORY` (
+  `CATEGORY_ID` INT NOT NULL,
+  `CATEGORY_NAME` VARCHAR(29) NOT NULL,
+  PRIMARY KEY (`CATEGORY_ID`));
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`PUBLISHER`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`PUBLISHER` (
+  `PUBLISHER_ID` INT NOT NULL,
+  `PUBLISHER_NAME` VARCHAR(90) NOT NULL,
+  PRIMARY KEY (`PUBLISHER_ID`));
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`BOOK`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`BOOK` (
+  `ISBN` VARCHAR(29) NOT NULL,
+  `TITLE` VARCHAR(90) NOT NULL,
+  `PUBLICATION_YEAR` YEAR NOT NULL,
+  `CATEGORY_ID` INT NOT NULL,
+  `PUBLISHER_ID` INT NOT NULL,
+  `THERSHOLD` INT UNSIGNED NOT NULL,
+  `PRICE` DECIMAL(7,2) NOT NULL,
+  `QUANTITY` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`ISBN`),
+  INDEX `TITLE_INDEX` (`TITLE` ASC),
+  INDEX `CATEGORY_INDEX` (`CATEGORY_ID` ASC),
+  CONSTRAINT `FK3`
+    FOREIGN KEY (`CATEGORY_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`CATEGORY` (`CATEGORY_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `FK4`
+    FOREIGN KEY (`PUBLISHER_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`PUBLISHER` (`PUBLISHER_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`PUBLISHER_PHONE`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`PUBLISHER_PHONE` (
+  `PUBLISHER_ID` INT NOT NULL,
+  `PHONE_NUMBER` VARCHAR(15) NOT NULL,
+  PRIMARY KEY (`PUBLISHER_ID`, `PHONE_NUMBER`),
+  CONSTRAINT `FK2`
+    FOREIGN KEY (`PUBLISHER_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`PUBLISHER` (`PUBLISHER_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`PUBLISHER_ADDRESS`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`PUBLISHER_ADDRESS` (
+  `PUBLISHER_ID` INT NOT NULL,
+  `ADDRESS` VARCHAR(45) NOT NULL,
+  `COUNTRY` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`PUBLISHER_ID`, `ADDRESS`, `COUNTRY`),
+  CONSTRAINT `FK1`
+    FOREIGN KEY (`PUBLISHER_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`PUBLISHER` (`PUBLISHER_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`AUTHOR`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`AUTHOR` (
+  `AUTHOR_ID` INT NOT NULL,
+  `AUTHOR_NAME` VARCHAR(90) NOT NULL,
+  PRIMARY KEY (`AUTHOR_ID`));
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`BOOK_AUTHOR`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`BOOK_AUTHOR` (
+  `AUTHOR_ID` INT NOT NULL,
+  `ISBN` VARCHAR(29) NOT NULL,
+  PRIMARY KEY (`AUTHOR_ID`, `ISBN`),
+  INDEX `AUTHOR_INDEX` (`AUTHOR_ID` ASC),
+  CONSTRAINT `FK5`
+    FOREIGN KEY (`AUTHOR_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`AUTHOR` (`AUTHOR_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `FK6`
+    FOREIGN KEY (`ISBN`)
+    REFERENCES `ONLINE_BOOK_STORE`.`BOOK` (`ISBN`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+DELIMITER $$
+CREATE TRIGGER CHECK_NEGATIVE_QUANTITY_UPDATE
+before update ON BOOK
+FOR EACH ROW
+begin
+    DECLARE msg varchar(255);
+	IF NEW.THERSHOLD < 0 OR NEW.QUANTITY < 0 THEN
+        SET msg = 'NEGATIVE_QUANTITY_UPDATE!' ;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER CHECK_NEGATIVE_QUANTITY_INSRET
+before INSERT ON BOOK
+FOR EACH ROW
+begin
+	DECLARE msg varchar(255);
+	IF NEW.THERSHOLD < 0 OR NEW.QUANTITY < 0 THEN
+		SET msg = 'NEGATIVE_QUANTITY_INSERT!' ;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER CHECK_THERSHOLD_UPDATE
+AFTER update ON BOOK
+FOR EACH ROW
+begin
+	IF NEW.QUANTITY < NEW.THERSHOLD AND OLD.QUANTITY >= NEW.THERSHOLD THEN
+       INSERT INTO book_order(ISBN, QUANTITY) values(NEW.ISBN, NEW.THERSHOLD);
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER CHECK_THERSHOLD_INSERT
+AFTER INSERT ON BOOK
+FOR EACH ROW
+begin
+	IF NEW.QUANTITY < NEW.THERSHOLD THEN
+       INSERT INTO book_order(ISBN, QUANTITY) values(NEW.ISBN, NEW.THERSHOLD);
+	END IF;
+END$$
+DELIMITER ;
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`USER`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`USER` (
+  `USER_ID` INT NOT NULL,
+  `USER_NAME` VARCHAR(45) NOT NULL,
+  `EMAIL` VARCHAR(45) NOT NULL,
+  `FNAME` VARCHAR(45) NOT NULL,
+  `LNAME` VARCHAR(45) NOT NULL,
+  `PASSWORD` VARCHAR(45) NOT NULL,
+  `PHONE_NUMBER` VARCHAR(15) NOT NULL,
+  `SHIPPING_ADDRESS` VARCHAR(45) NOT NULL,
+  `IS_MANAGER` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`USER_ID`),
+  UNIQUE INDEX `EMAIL_UNIQUE` (`EMAIL` ASC) VISIBLE);
+
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`SHOPPING_CART`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`SHOPPING_CART` (
+  `ORDER_ID` VARCHAR(29) NOT NULL,
+  `USER_ID` INT NOT NULL,
+  `CHECKOUT_TIME` date NOT NULL,
+  PRIMARY KEY (`ORDER_ID`),
+  INDEX `CHECKOUT_TIME_INDEX` (`CHECKOUT_TIME` ASC),
+  CONSTRAINT `FK7`
+    FOREIGN KEY (`USER_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`USER` (`USER_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+CREATE EVENT REMOVE_OLD_CART_ORDERS
+ON SCHEDULE EVERY 1 DAY
+DO
+   DELETE FROM SHOPPING_CART WHERE CHECKOUT_TIME < NOW() - interval 3 MONTH;
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`CART_ITEMS`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`CART_ITEMS` (
+  `ORDER_ID` VARCHAR(29) NOT NULL,
+  `ISBN` VARCHAR(29) NOT NULL,
+  `QUANTITY` INT NOT NULL,
+  `PRICE` DECIMAL(7,2) NOT NULL,
+  PRIMARY KEY (`ORDER_ID`, `ISBN`),
+  INDEX `FK9_idx` (`ISBN` ASC) VISIBLE,
+  CONSTRAINT `FK8`
+    FOREIGN KEY (`ORDER_ID`)
+    REFERENCES `ONLINE_BOOK_STORE`.`SHOPPING_CART` (`ORDER_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `FK9`
+    FOREIGN KEY (`ISBN`)
+    REFERENCES `ONLINE_BOOK_STORE`.`BOOK` (`ISBN`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+-- -----------------------------------------------------
+-- Table `ONLINE_BOOK_STORE`.`BOOK_ORDER`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`BOOK_ORDER` (
+  `ID` VARCHAR(29) NOT NULL,
+  `ISBN` VARCHAR(29) NOT NULL,
+  `QUANTITY` INT NOT NULL,
+  `CHECKOUT_TIME` date NOT NULL,
+  PRIMARY KEY (`ID`),
+  INDEX `FK10_idx` (`ISBN` ASC) VISIBLE,
+  CONSTRAINT `FK10`
+    FOREIGN KEY (`ISBN`)
+    REFERENCES `ONLINE_BOOK_STORE`.`BOOK` (`ISBN`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+CREATE EVENT REMOVE_OLD_BOOK_ORDERS
+ON SCHEDULE EVERY 1 DAY
+DO
+   DELETE FROM BOOK_ORDER WHERE CHECKOUT_TIME < NOW() - interval 3 MONTH;  
+
+DELIMITER $$
+CREATE trigger BOOK_QUANTITY_AFTER_ORDER 
+before delete ON book_order
+FOR each row
+BEGIN
+	update BOOK
+    SET book.QUANTITY = BOOK.QUANTITY + OLD.QUANTITY
+    WHERE book.ISBN = OLD.ISBN;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+create trigger INSERT_NEGATIVE_ORDER
+before INSERT ON book_order
+for each row
+BEGIN
+    DECLARE msg varchar(255);
+	IF NEW.QUANTITY < 0 THEN
+         SET msg = 'INSERT_NEGATIVE_ORDER!' ;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+create trigger UPDATE_NEGATIVE_ORDER
+before update ON book_order
+for each row
+BEGIN
+	DECLARE msg varchar(255);
+	IF NEW.QUANTITY < 0 THEN
+      SET msg = 'UPDATE_NEGATIVE_ORDER!' ;
+	  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE trigger UPDATE_SHOPPING_CART
+BEFORE insert ON cart_items
+for each row
+BEGIN
+	DECLARE msg varchar(255);
+	update book
+	SET BOOK.QUANTITY = BOOK.QUANTITY - NEW.QUANTITY
+	where book.ISBN = NEW.ISBN AND BOOK.QUANTITY >= NEW.QUANTITY;
+    IF(row_count() = 0) THEN
+        SET msg = 'NOT_ENOUGH_BOOKS!' ;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg; 
+	end if;
+END$$
+DELIMITER ;
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Author.txt' into table author;
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher.txt' into table publisher; 
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Book2.txt' into table book;
+SET  FOREIGN_KEY_CHECKS=0; 
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Book_Authors.txt' into table book_author;
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Orders.txt' into table book_order;
+
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher_Address.txt' into table publisher_address;
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher_Phone.txt' into table publisher_phone;

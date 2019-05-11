@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ManagerViewController">
+   <children>
+      <AnchorPane prefHeight="400.0" prefWidth="206.0">
+         <children>
+            <Button fx:id="addBtn" layoutX="66.0" layoutY="28.0" mnemonicParsing="false" onAction="#addBook" text="Add Books" />
+            <Button fx:id="modBtn" layoutX="60.0" layoutY="81.0" mnemonicParsing="false" onAction="#modifyExisting" text="Modify Book" />
+            <Button fx:id="ordBtn" layoutX="61.0" layoutY="143.0" mnemonicParsing="false" onAction="#placeOrder" text="Order Books" />
+            <Button fx:id="proBtn" layoutX="59.0" layoutY="200.0" mnemonicParsing="false" onAction="#promoteUser" text="Promote User" />
+            <Button fx:id="viewBtn" layoutX="63.0" layoutY="251.0" mnemonicParsing="false" onAction="#viewOrders" text="View Orders" />
+            <Button fx:id="bookOrdBtn" layoutX="47.0" layoutY="309.0" mnemonicParsing="false" onAction="#viewBookOrders" text="View Book Orders" />
+            <Button fx:id="confBtn" layoutX="57.0" layoutY="353.0" mnemonicParsing="false" onAction="#confirmOrder" text="Confirm Order" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="secondAnchor" layoutX="218.0" prefHeight="400.0" prefWidth="382.0">
+         <children>
+            <Button fx:id="confirmBtn" layoutX="309.0" layoutY="361.0" mnemonicParsing="false" text="Confirm" visible="false" />
+            <TextField fx:id="first" layoutX="115.0" layoutY="15.0" visible="false" />
+            <TextField fx:id="second" layoutX="117.0" layoutY="48.0" visible="false" />
+            <TextField fx:id="third" layoutX="117.0" layoutY="82.0" visible="false" />
+            <TextField fx:id="forth" layoutX="117.0" layoutY="118.0" visible="false" />
+            <TextField fx:id="fifth" layoutX="117.0" layoutY="149.0" visible="false" />
+            <TextField fx:id="sixth" layoutX="117.0" layoutY="180.0" visible="false" />
+            <TextField fx:id="seventh" layoutX="117.0" layoutY="211.0" visible="false" />
+            <TextField fx:id="eighth" layoutX="117.0" layoutY="244.0" visible="false" />
+            <TextField fx:id="ninth" layoutX="117.0" layoutY="276.0" visible="false" />
+            <ScrollPane fx:id="ordersScrollPane" layoutX="8.0" layoutY="82.0" prefHeight="304.0" prefWidth="363.0" visible="false">
+              <content>
+                <AnchorPane fx:id="ordersAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+              </content>
+            </ScrollPane>
+            <Button layoutX="353.0" mnemonicParsing="false" onAction="#backPressed" text="&lt;-" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

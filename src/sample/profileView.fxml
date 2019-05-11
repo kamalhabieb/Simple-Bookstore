@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ProfileViewController">
+
+    <children>
+        <TextField fx:id="usr_name" layoutX="115.0" layoutY="15.0" promptText="USER NAME" />
+        <TextField fx:id="f_name" layoutX="117.0" layoutY="48.0" promptText="First Name" />
+        <TextField fx:id="l_name" layoutX="117.0" layoutY="82.0" promptText="Last Name" />
+        <TextField fx:id="email" layoutX="117.0" layoutY="118.0" promptText="EMAIL" />
+        <TextField fx:id="phone_number" layoutX="117.0" layoutY="149.0" promptText="PHONE NUMBER" />
+        <TextField fx:id="shipping_address" layoutX="117.0" layoutY="180.0" promptText="SHIPPING ADDRESS" />
+      <PasswordField fx:id="passwordField" layoutX="117.0" layoutY="212.0" promptText="PASSWORD" />
+      <Button layoutX="14.0" layoutY="15.0" mnemonicParsing="false" onAction="#editInfo" text="Edit" />
+      <Button layoutX="459.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmPressed" prefHeight="25.0" prefWidth="120.0" text="confirm change" />
+      <Button layoutX="564.0" layoutY="3.0" mnemonicParsing="false" onAction="#backPressed" text="&lt;-" />
+    </children>
+
+</AnchorPane>

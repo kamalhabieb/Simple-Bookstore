@@ -11,9 +11,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -324,18 +326,33 @@ public class ManagerViewController {
             topBooks.setVisible(false);
             topUsers.setVisible(false);
             topSales.setVisible(false);
-        } else {
-            if (!first.getText().isEmpty()) {
-                bookOrderISBN = first.getText();
-                ResultSet resultSet = manager.viewBookOrder(bookOrderISBN);
-                ArrayList<OrderInfo> orderInfos = new ArrayList<>();
-                while (resultSet.next()) {
-                    OrderInfo orderInfo = new OrderInfo(resultSet.getString(1), resultSet.getString(2)
-                            , resultSet.getInt(3), resultSet.getString(4));
-                    orderInfos.add(orderInfo);
-                    previewOrder(orderInfo);
+
+            first.setOnKeyReleased(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    if (!first.getText().isEmpty()) {
+                        bookOrderISBN = first.getText();
+                        ResultSet resultSet = manager.viewBookOrder(bookOrderISBN);
+                        ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+                        while (true) {
+                            try {
+                                if (!resultSet.next()) break;
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            OrderInfo orderInfo = null;
+                            try {
+                                orderInfo = new OrderInfo(resultSet.getString(1), resultSet.getString(2)
+                                        , resultSet.getInt(3), resultSet.getString(4));
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            orderInfos.add(orderInfo);
+                            previewOrder(orderInfo);
+                        }
+                    }
                 }
-            }
+            });
+        } else {
             bookOrdersReady = false;
             first.setVisible(false);
             addBtn.setVisible(true);
@@ -346,8 +363,8 @@ public class ManagerViewController {
             viewReports.setVisible(true);
         }
     }
-    
-    public void viewReportPressed(){
+
+    public void viewReportPressed() {
         if (!viewReportReady) {
             viewReportReady = true;
             first.setVisible(false);
@@ -368,7 +385,7 @@ public class ManagerViewController {
             topBooks.setVisible(true);
             topUsers.setVisible(true);
             topSales.setVisible(true);
-        }else{
+        } else {
             viewReportReady = false;
             first.setVisible(false);
             second.setVisible(false);
@@ -402,15 +419,15 @@ public class ManagerViewController {
         window.show();
     }
 
-    public void getTopUsersReport(){
+    public void getTopUsersReport() {
         reportFunctions.getTopFiveUsers();
     }
 
-    public void getTopBooksReport(){
+    public void getTopBooksReport() {
         reportFunctions.getTopTenBooks();
     }
 
-    public void getTopSalseReport(){
+    public void getTopSalseReport() {
         reportFunctions.getTopSales();
     }
 }

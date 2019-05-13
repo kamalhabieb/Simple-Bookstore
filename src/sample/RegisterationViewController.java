@@ -53,6 +53,12 @@ public class RegisterationViewController {
         str_password = password.getText();
         str_phoneNumber = phoneNumber.getText();
 
+        if(!str_email.matches(".+@.+\\..+")){
+            System.out.println("Error");
+            System.out.println("not an email format");
+            return;
+        }
+
         Boolean valid = customer.register(str_uName, str_email,str_fName,str_lName,str_password,str_phoneNumber,str_address);
 
         if (valid){

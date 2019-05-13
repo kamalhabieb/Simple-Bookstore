@@ -1,10 +1,12 @@
 package sample;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,12 +39,46 @@ public class cartViewController {
     private void viewCartItems (ArrayList<CartItem> items){
         for(CartItem item : items){
             totalQuantity+=item.getQuantity();
-            totalPrice+=item.getPrice();
+            totalPrice+=item.getPrice()*item.getQuantity();
             HBox hbox = new HBox();
+            Label title = new Label(item.getTitle());
             Label quantity = new Label("Quantity: "+item.getQuantity());
             Label price = new Label("Each: "+item.getPrice());
-            hbox.getChildren().addAll(quantity,price);
-            hbox.setSpacing(150);
+            Button increment = new Button("+");
+            increment.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    regCustomer.increaseQuantityOfCartItem(item);
+                    quantity.setText("Quantity: "+item.getQuantity());
+                    totalPrice += item.getPrice();
+                    totalPriceLabel.setText(""+totalPrice);
+                    totalQuantity++;
+                    totalQuantityLabel.setText(""+totalQuantity);
+                }
+            });
+            Button decrement = new Button("-");
+            decrement.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    if (item.getQuantity()>1) {
+                        regCustomer.decreaseQuantityOfCartItem(item);
+                        quantity.setText("Quantity: " + item.getQuantity());
+                        totalPrice -= item.getPrice();
+                        totalPriceLabel.setText("" + totalPrice);
+                        totalQuantity--;
+                        totalQuantityLabel.setText("" + totalQuantity);
+                    }else{
+                        hbox.setVisible(false);
+                        totalPrice -= item.getPrice();
+                        totalPriceLabel.setText("" + totalPrice);
+                        totalQuantity--;
+                        totalQuantityLabel.setText("" + totalQuantity);
+
+                    }
+                }
+            });
+            hbox.getChildren().addAll(title,quantity,price,increment,decrement);
+            hbox.setSpacing(100);
             cartItemsVbox.getChildren().add(hbox);
         }
 

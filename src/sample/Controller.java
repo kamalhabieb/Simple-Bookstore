@@ -30,6 +30,10 @@ public class Controller {
         login_email = login_email_tf.getText();
         login_password = login_password_tf.getText();
         //todo make the passwordField hidden
+        if(!login_email.matches(".+@.+\\..+")){
+            System.out.println("not an email format");
+            return;
+        }
         User user = customer.login(login_email,login_password);
         RegisteredCustomer registeredCustomer = new RegisteredCustomer();
         if (user != null){

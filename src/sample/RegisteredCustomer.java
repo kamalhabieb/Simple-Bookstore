@@ -195,7 +195,6 @@ public class RegisteredCustomer {
     }
 
     void increaseQuantityOfCartItem(CartItem cartItem){
-        cartItem.setPrice((cartItem.getPrice()/cartItem.getQuantity())*(cartItem.getQuantity()+1));
         cartItem.setQuantity(cartItem.getQuantity()+1);
     }
 
@@ -208,8 +207,7 @@ public class RegisteredCustomer {
             }
         }
         else {
-            cartItem.setPrice((cartItem.getPrice() / cartItem.getQuantity()) * (cartItem.getQuantity() + 1));
-            cartItem.setQuantity(cartItem.getQuantity() + 1);
+            cartItem.setQuantity(cartItem.getQuantity() - 1);
         }
     }
 }

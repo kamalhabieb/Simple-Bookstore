@@ -102,8 +102,8 @@ public class MainViewController {
     }
 
     public void cartButtonPressed(ActionEvent event) throws IOException, SQLException {
-
-        registeredCustomer.addToShoppingCart("ADDDE",12,user,"Sdad");
+        String orderId = registeredCustomer.getRandomOrderID();
+        registeredCustomer.addToShoppingCart("ADDDE",12,user,orderId);
         ///////////////////////
         FXMLLoader loader = new FXMLLoader(getClass().getResource("cartView.fxml"));
         Parent mainViewParent = (Parent) loader.load();

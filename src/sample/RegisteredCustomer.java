@@ -172,6 +172,7 @@ public class RegisteredCustomer {
     }
 
     //todo credit card info
+    //todo make the user use this pattern in expiry date   "dd-MM-yyyy"
     boolean checkCreditCard(String number,String expiryDate,String pin){
         if(number.length()==16 && number.charAt(0)=='4'){ // accepting visa only
             SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy");

@@ -1,6 +1,8 @@
 package sample;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -165,6 +167,28 @@ public class RegisteredCustomer {
         } finally {
             conc.setAutoCommit(true);
 
+        }
+        return false;
+    }
+
+    //todo credit card info
+    boolean checkCreditCard(String number,String expiryDate,String pin){
+        if(number.length()==16 && number.charAt(0)=='4'){ // accepting visa only
+            SimpleDateFormat textFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String paramDateAsString = expiryDate;
+            java.util.Date myDate = null;
+            java.util.Date now = new java.util.Date();
+
+            try {
+                myDate = textFormat.parse(paramDateAsString);
+                if(myDate.before(now)){  // not expired
+                    if(pin.length()==4){
+                        return true;
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }

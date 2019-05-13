@@ -149,20 +149,7 @@ public class Manager {
     //gets order, if found add quantity to book quantity, delete order (accepted)
 
     boolean confirmOrder(String orderId){
-        String ISBN = "";
-        int quantity =0;
         try {
-            Statement stmt = SQLConnection.getInstance().getConnection().createStatement();
-            ResultSet rs= stmt.executeQuery("Select ISBN,QUANTITY From BOOK_ORDER Where ID = '" +orderId+"' ;");
-            if(rs.next()) {
-                ISBN = rs.getString(1);
-                quantity = rs.getInt(2);
-            }
-            PreparedStatement updateBookQuantity=SQLConnection.getInstance().getConnection().prepareStatement(
-                    "UPDATE BOOK SET QUANTITY = Quantity + " + quantity+" WHERE ISBN = '"+ISBN+"' ;");
-            if(updateBookQuantity.execute()){
-                return false;
-            }
             PreparedStatement deleteBookOrder=SQLConnection.getInstance().getConnection().prepareStatement(
                     "DELETE FROM BOOK_ORDER WHERE ID = '" + orderId +"' ;");
             if(deleteBookOrder.execute()){
@@ -207,6 +194,17 @@ public class Manager {
         try {
             Statement getAllOrders = SQLConnection.getInstance().getConnection().createStatement();
             rs = getAllOrders.executeQuery("SELECT * FROM BOOK_ORDER WHERE ISBN = '"+ ISBN +"' ;");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    ResultSet viewUsers(){
+        ResultSet rs = null;
+        try {
+            Statement viewUsers = SQLConnection.getInstance().getConnection().createStatement();
+            rs = viewUsers.executeQuery("SELECT * FROM USER WHERE IS_MANAGER = 0 ;");
         } catch (SQLException e) {
             e.printStackTrace();
         }

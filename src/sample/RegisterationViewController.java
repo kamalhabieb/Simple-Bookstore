@@ -37,7 +37,7 @@ public class RegisterationViewController {
 
     }
 
-    public void initController(Customer cust, User usr){
+    public void initController(Customer cust){
         this.customer = cust;
     }
 

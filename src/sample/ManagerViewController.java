@@ -1,19 +1,23 @@
 package sample;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ManagerViewController {
     public TextField first;
@@ -27,15 +31,13 @@ public class ManagerViewController {
     public TextField ninth;
     public Button confirmBtn;
     public ScrollPane ordersScrollPane;
-    public AnchorPane ordersAnchorPane;
     public Button addBtn;
     public Button modBtn;
     public Button ordBtn;
     public Button proBtn;
     public Button viewBtn;
     public Button bookOrdBtn;
-    public Button confBtn;
-
+    public VBox ordersVBox;
     boolean addBookReady = false;
     String ISBN;
     String title;
@@ -49,29 +51,26 @@ public class ManagerViewController {
     private String modifyISBN;
     private int modifySoldQuantity;
     private boolean modifyBookReady = false;
-
     private String orderISBN;
     private boolean placeOrderReady = false;
-    String orderId;
-    private boolean confirmOrderReady = false;
     private boolean promoteUserReady = false;
     private int userId;
     private boolean bookOrdersReady = false;
     private String bookOrderISBN;
     private boolean viewOrdersReady = false;
-
-    private Manager manager ;
+    private Manager manager;
     private int orderQuantity;
-
     private User user;
-
-    public void initController(User usr){
+    public void initController(User usr) {
         this.user = usr;
     }
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         manager = new Manager();
+        ordersScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        ordersScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        ordersVBox.setSpacing(5);
     }
 
     public void addBook() {
@@ -100,17 +99,20 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
-            confBtn.setVisible(false);
         } else {
-            ISBN = first.getText();
-            title = second.getText();
-            publicationYear = third.getText();
-            category = forth.getText();
-            publisher = fifth.getText();
-            threshold = Integer.parseInt(sixth.getText());
-            price = Float.parseFloat(seventh.getText());
-            quantity = Integer.parseInt(eighth.getText());
-            author = ninth.getText();
+            if (!first.getText().isEmpty() && !second.getText().isEmpty() && !third.getText().isEmpty() && !forth.getText().isEmpty() &&
+                    !fifth.getText().isEmpty() && !sixth.getText().isEmpty() && !seventh.getText().isEmpty() && !eighth.getText().isEmpty() && !ninth.getText().isEmpty()) {
+                ISBN = first.getText();
+                title = second.getText();
+                publicationYear = third.getText();
+                category = forth.getText();
+                publisher = fifth.getText();
+                threshold = Integer.parseInt(sixth.getText());
+                price = Float.parseFloat(seventh.getText());
+                quantity = Integer.parseInt(eighth.getText());
+                author = ninth.getText();
+                manager.addNewBooks(ISBN, title, publicationYear, category, publisher, threshold, price, quantity, author);
+            }
             addBookReady = false;
             first.setVisible(false);
             second.setVisible(false);
@@ -126,14 +128,12 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
-            confBtn.setVisible(true);
 
-            manager.addNewBooks(ISBN, title, publicationYear, category, publisher, threshold, price, quantity, author);
         }
 
     }
 
-    public void modifyExisting(){
+    public void modifyExisting() {
         if (!modifyBookReady) {
             first.setPromptText("ISBN");
             first.setVisible(true);
@@ -147,24 +147,25 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
-            confBtn.setVisible(false);
         } else {
-            modifyISBN = first.getText();
-            modifySoldQuantity = Integer.parseInt(second.getText());
+            if (!first.getText().isEmpty() && !second.getText().isEmpty() && !third.getText().isEmpty() && !forth.getText().isEmpty() &&
+                    !fifth.getText().isEmpty()) {
+                modifyISBN = first.getText();
+                modifySoldQuantity = Integer.parseInt(second.getText());
+                manager.modifyExisting(modifyISBN, modifySoldQuantity);
+            }
             modifyBookReady = false;
             first.setVisible(false);
             second.setVisible(false);
-            manager.modifyExisting(modifyISBN,modifySoldQuantity);
             addBtn.setVisible(true);
             ordBtn.setVisible(true);
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
-            confBtn.setVisible(true);
         }
     }
 
-    public void placeOrder(){
+    public void placeOrder() {
         if (!placeOrderReady) {
             first.setPromptText("ISBN");
             first.setVisible(true);
@@ -178,131 +179,123 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
-            confBtn.setVisible(false);
         } else {
-            orderISBN = first.getText();
-            orderQuantity = Integer.parseInt(second.getText());
+            if (!first.getText().isEmpty() && !second.getText().isEmpty()) {
+                orderISBN = first.getText();
+                orderQuantity = Integer.parseInt(second.getText());
+                manager.placeOrder(orderISBN, orderQuantity);
+            }
             placeOrderReady = false;
             first.setVisible(false);
             second.setVisible(false);
-            manager.placeOrder(orderISBN,orderQuantity);
             addBtn.setVisible(true);
             modBtn.setVisible(true);
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
-            confBtn.setVisible(true);
         }
     }
 
-    public void confirmOrder(){
-        if (!confirmOrderReady) {
-            first.setPromptText("ISBN");
-            first.setVisible(true);
-            confirmOrderReady = true;
-            ordersScrollPane.setVisible(false);
+    private void confirmOrder(String orderId) {
+        manager.confirmOrder(orderId);
 
-            addBtn.setVisible(false);
-            modBtn.setVisible(false);
-            proBtn.setVisible(false);
-            viewBtn.setVisible(false);
-            bookOrdBtn.setVisible(false);
-            ordBtn.setVisible(false);
-        } else {
-            orderId = first.getText();
-            confirmOrderReady = false;
-            first.setVisible(false);
-
-            manager.confirmOrder(orderId);
-
-            addBtn.setVisible(true);
-            modBtn.setVisible(true);
-            proBtn.setVisible(true);
-            viewBtn.setVisible(true);
-            bookOrdBtn.setVisible(true);
-            ordBtn.setVisible(true);
-        }
     }
 
-    public void promoteUser (){
+    public void promoteUser() {
         if (!promoteUserReady) {
             first.setPromptText("User ID");
             first.setVisible(true);
             promoteUserReady = true;
             ordersScrollPane.setVisible(false);
-
             addBtn.setVisible(false);
             modBtn.setVisible(false);
-            confBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
             ordBtn.setVisible(false);
         } else {
-            userId = Integer.parseInt(first.getText());
+            if (!first.getText().isEmpty()) {
+                userId = Integer.parseInt(first.getText());
+                manager.promoteUser(userId);
+            }
             promoteUserReady = false;
             first.setVisible(false);
-
-            manager.promoteUser(userId);
-
             addBtn.setVisible(true);
             modBtn.setVisible(true);
-            confBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
             ordBtn.setVisible(true);
         }
     }
 
-    public void viewOrders (){
+    public void viewOrders() throws SQLException {
         if (!viewOrdersReady) {
             viewOrdersReady = true;
             ordersScrollPane.setVisible(true);
-
             addBtn.setVisible(false);
             modBtn.setVisible(false);
-            confBtn.setVisible(false);
             proBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
             ordBtn.setVisible(false);
+            ResultSet resultSet = manager.viewBookOrders();
+            ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+            while (resultSet.next()) {
+                OrderInfo orderInfo = new OrderInfo(resultSet.getString(1), resultSet.getString(2)
+                        , resultSet.getInt(3), resultSet.getString(4));
+                orderInfos.add(orderInfo);
+                previewOrder(orderInfo);
+            }
         } else {
             viewOrdersReady = false;
             ordersScrollPane.setVisible(false);
-
-            ResultSet resultSet = manager.viewBookOrders();
-
             addBtn.setVisible(true);
             modBtn.setVisible(true);
-            confBtn.setVisible(true);
             proBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
             ordBtn.setVisible(true);
+            ordersVBox.getChildren().clear();
         }
 
     }
 
-    public void viewBookOrders (){
+    private void previewOrder(OrderInfo orderInfo) {
+        HBox hBox = new HBox();
+        hBox.setSpacing(10);
+        Label ISBN = new Label(orderInfo.ISBN);
+        Label id = new Label(orderInfo.orderId);
+        Label quantity = new Label("" + orderInfo.quantity);
+        Label Date = new Label(orderInfo.checkoutDate);
+        Button button = new Button("confirm");// todo backend don't add book in confirm order
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                confirmOrder(orderInfo.orderId);
+                hBox.setVisible(false);
+            }
+        });
+        hBox.getChildren().addAll(ISBN, id, quantity, Date, button);
+        ordersVBox.getChildren().add(hBox);
+    }
+
+    public void viewBookOrders() {
         if (!bookOrdersReady) {
             first.setPromptText("Book ISBN");
             first.setVisible(true);
             bookOrdersReady = true;
             ordersScrollPane.setVisible(false);
-
             addBtn.setVisible(false);
             modBtn.setVisible(false);
-            confBtn.setVisible(false);
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             ordBtn.setVisible(false);
         } else {
-            bookOrderISBN = first.getText();
+            if (!first.getText().isEmpty()) {
+                bookOrderISBN = first.getText();
+                ResultSet resultSet = manager.viewBookOrder(bookOrderISBN);
+            }
             bookOrdersReady = false;
             first.setVisible(false);
-
-            ResultSet resultSet = manager.viewBookOrder(bookOrderISBN);
-
             addBtn.setVisible(true);
             modBtn.setVisible(true);
-            confBtn.setVisible(true);
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             ordBtn.setVisible(true);

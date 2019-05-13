@@ -141,18 +141,20 @@ AFTER update ON BOOK
 FOR EACH ROW
 begin
 	IF NEW.QUANTITY < NEW.THERSHOLD AND OLD.QUANTITY >= NEW.THERSHOLD THEN
-       INSERT INTO book_order(ISBN, QUANTITY) values(NEW.ISBN, NEW.THERSHOLD);
+       INSERT INTO book_order(ID, ISBN, QUANTITY, CHECKOUT_TIME) values(NEW.ISBN, NEW.ISBN, NEW.THERSHOLD-NEW.QUANTITY, CURDATE());
 	END IF;
 END$$
 DELIMITER ;
-
+select * from book where isbn = '29';
+update book set quantity=29 where isbn ='29';
+update book set quantity = quantity - 30 where isbn = '29';
 DELIMITER $$
 CREATE TRIGGER CHECK_THERSHOLD_INSERT
 AFTER INSERT ON BOOK
 FOR EACH ROW
 begin
 	IF NEW.QUANTITY < NEW.THERSHOLD THEN
-       INSERT INTO book_order(ISBN, QUANTITY) values(NEW.ISBN, NEW.THERSHOLD);
+       INSERT INTO book_order(ID, ISBN, QUANTITY, CHECKOUT_TIME) values(NEW.ISBN, NEW.ISBN, NEW.THERSHOLD-NEW.QUANTITY, CURDATE());
 	END IF;
 END$$
 DELIMITER ;
@@ -160,7 +162,7 @@ DELIMITER ;
 -- Table `ONLINE_BOOK_STORE`.`USER`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`USER` (
-  `USER_ID` INT NOT NULL,
+  `USER_ID` INT NOT NULL AUTO_INCREMENT,
   `USER_NAME` VARCHAR(45) NOT NULL,
   `EMAIL` VARCHAR(45) NOT NULL,
   `FNAME` VARCHAR(45) NOT NULL,
@@ -170,7 +172,8 @@ CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`USER` (
   `SHIPPING_ADDRESS` VARCHAR(45) NOT NULL,
   `IS_MANAGER` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`USER_ID`),
-  UNIQUE INDEX `EMAIL_UNIQUE` (`EMAIL` ASC) VISIBLE);
+  UNIQUE INDEX `EMAIL_UNIQUE` (`EMAIL` ASC) VISIBLE)
+  AUTO_INCREMENT = 3;
 
 
 -- -----------------------------------------------------
@@ -178,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`USER` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`SHOPPING_CART` (
   `ORDER_ID` VARCHAR(29) NOT NULL,
-  `USER_ID` INT NOT NULL,
+  `USER_ID` INT NOT NULL AUTO_INCREMENT,
   `CHECKOUT_TIME` date NOT NULL,
   PRIMARY KEY (`ORDER_ID`),
   INDEX `CHECKOUT_TIME_INDEX` (`CHECKOUT_TIME` ASC),
@@ -190,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`SHOPPING_CART` (
 CREATE EVENT REMOVE_OLD_CART_ORDERS
 ON SCHEDULE EVERY 1 DAY
 DO
-   DELETE FROM SHOPPING_CART WHERE CHECKOUT_TIME < NOW() - interval 3 MONTH;
+   DELETE FROM SHOPPING_CART WHERE CHECKOUT_TIME < CURDATE() - interval 3 MONTH;
 
 -- -----------------------------------------------------
 -- Table `ONLINE_BOOK_STORE`.`CART_ITEMS`
@@ -228,10 +231,11 @@ CREATE TABLE IF NOT EXISTS `ONLINE_BOOK_STORE`.`BOOK_ORDER` (
     REFERENCES `ONLINE_BOOK_STORE`.`BOOK` (`ISBN`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
+    drop table book_order;
 CREATE EVENT REMOVE_OLD_BOOK_ORDERS
 ON SCHEDULE EVERY 1 DAY
 DO
-   DELETE FROM BOOK_ORDER WHERE CHECKOUT_TIME < NOW() - interval 3 MONTH;  
+   DELETE FROM BOOK_ORDER WHERE CHECKOUT_TIME < CURDATE() - interval 3 MONTH;  
 
 DELIMITER $$
 CREATE trigger BOOK_QUANTITY_AFTER_ORDER 
@@ -244,6 +248,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+select * from book where isbn ='29';
+delete from book_order where id = 16;
 DELIMITER $$
 create trigger INSERT_NEGATIVE_ORDER
 before INSERT ON book_order
@@ -285,12 +291,5 @@ BEGIN
 	end if;
 END$$
 DELIMITER ;
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Author.txt' into table author;
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher.txt' into table publisher; 
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Book2.txt' into table book;
-SET  FOREIGN_KEY_CHECKS=0; 
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Book_Authors.txt' into table book_author;
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Orders.txt' into table book_order;
-
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher_Address.txt' into table publisher_address;
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Publisher_Phone.txt' into table publisher_phone;
+insert into cart_items values("o8", "29", 100, 31.00);
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Dummy Data/Orders.txt' into table book_order;

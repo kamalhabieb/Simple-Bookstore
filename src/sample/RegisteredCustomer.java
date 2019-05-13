@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class RegisteredCustomer {
-   private ArrayList<CartItem> shoppingCart = new ArrayList<>();
+    private ArrayList<CartItem> shoppingCart = new ArrayList<>();
 
     boolean editPersonalInfo(User user){
         try {
@@ -29,9 +29,9 @@ public class RegisteredCustomer {
         return false;
     }
 
-    boolean addToShoppingCart(String isbn, int quantity, User user, String orderID)throws SQLException {
+    boolean addToShoppingCart(String isbn, int quantity, User user, String orderID)throws SQLException{
         String query = "SELECT PRICE, QUANTITY FROM BOOK" +
-                "WHERE ISBN ='" + isbn + "';";
+                " WHERE ISBN ='" + isbn + "';";
         ResultSet rs = SQLConnection.getInstance().getData(query);
         if (rs.next()){
             int quantity1 = 0;
@@ -78,8 +78,8 @@ public class RegisteredCustomer {
     float viewTotalPriceInCart(){
         float price = 0;
         for (int i = 0; i < shoppingCart.size(); i++) {
-           int quantity = shoppingCart.get(i).getQuantity();
-           price += quantity * shoppingCart.get(i).getPrice();
+            int quantity = shoppingCart.get(i).getQuantity();
+            price += quantity * shoppingCart.get(i).getPrice();
         }
         return price;
     }
@@ -110,19 +110,19 @@ public class RegisteredCustomer {
                 String isbn = shoppingCart.get(i).getIsbn();
                 int quantity = shoppingCart.get(i).getQuantity();
                 String query = "UPDATE BOOK SET QUANTITY = QUANTITY -" + String.valueOf(quantity) +
-                        "WHERE ISBN ='" + isbn + "';";
+                        " WHERE ISBN ='" + isbn + "';";
                 stat.executeUpdate(query);
                 String testQuery = "SELECT USER_ID, ISBN FROM SHOPPING_CART NATURAL JOIN CART_ITEMS WHERE USER_ID =" +
-                        String.valueOf(shoppingCart.get(i).getUserID()) + "AND ISBN = '" + isbn + "';";
+                        String.valueOf(shoppingCart.get(i).getUserID()) + " AND ISBN = '" + isbn + "';";
                 if (stat.executeQuery(testQuery).next()){
                     String query1 = "UPDATE CART_ITEMS SET QUANTITY = QUANTITY +" + String.valueOf(quantity) +
-                            "WHERE ORDER_ID = '" + shoppingCart.get(i).getOrderID() + "' AND ISBN = '" + isbn + "';";
+                            " WHERE ORDER_ID = '" + shoppingCart.get(i).getOrderID() + "' AND ISBN = '" + isbn + "';";
                     stat.executeUpdate(query1);
                 } else {
                     String query1 = "INSERT INTO SHOPPING_CART VALUES ('" + shoppingCart.get(i).getOrderID() + "'," +
-                           shoppingCart.get(i).getUserID() + ",'" + currentDate + "');";
+                            shoppingCart.get(i).getUserID() + ",'" + currentDate + "');";
                     String query2 = "INSERT INTO CART_ITEMS VALUES ('" + shoppingCart.get(i).getOrderID() + "','" + isbn + "',"
-                           + String.valueOf(quantity) + "," + shoppingCart.get(i).getPrice() + ");";
+                            + String.valueOf(quantity) + "," + shoppingCart.get(i).getPrice() + ");";
                     stat.executeUpdate(query1);
                     stat.executeUpdate(query2);
                 }

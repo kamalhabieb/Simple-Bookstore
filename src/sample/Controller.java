@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -14,7 +15,7 @@ import java.io.IOException;
 public class Controller {
 
     public TextField login_email_tf;
-    public TextField login_password_tf;
+    public PasswordField login_password_tf;
     private String login_email;
     private String login_password;
     private Customer customer;
@@ -46,7 +47,11 @@ public class Controller {
     }
 
     public void regButtonClicked (ActionEvent event) throws IOException {
-        Parent regViewParent = FXMLLoader.load(getClass().getResource("registerationView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("registerationView.fxml"));
+        Parent regViewParent = (Parent) loader.load();
+        RegisterationViewController regViewController = loader.getController();
+        regViewController.initController(customer);
+
         Scene regViewScene = new Scene(regViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(regViewScene);

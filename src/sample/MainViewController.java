@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,10 +9,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MainViewController {
@@ -21,14 +27,17 @@ public class MainViewController {
     public Button search_button;
     public Button profileBtn;
     public Button logoutBtn;
+    public VBox searchResultVBox;
 
     private User user;
     private RegisteredCustomer registeredCustomer;
     private FindBooks find;
+
     @FXML
     private void initialize() {
         registeredCustomer = new RegisteredCustomer();
-            find = new FindBooks();
+        find = new FindBooks();
+        searchResultVBox.setSpacing(10);
         search_type_box.setValue("ISBN");
         search_type_box.getItems().addAll("ISBN", "Title", "Category", "Publisher", "Author", "PubYear");
 
@@ -48,34 +57,35 @@ public class MainViewController {
         ArrayList books = new ArrayList<Book>();
         //todo if invalid search show error
 
-        switch (searchType){
-            case "ISBN":{
+        switch (searchType) {
+            case "ISBN": {
                 Book book = find.findByISBN(searchValue);
                 books.add(book);
                 break;
             }
-            case "Title":{
+            case "Title": {
                 Book book = find.findByTitle(searchValue);
                 books.add(book);
                 break;
             }
-            case "Category":{
+            case "Category": {
                 books = find.findByCategory(searchValue);
                 break;
             }
-            case "Publisher":{
+            case "Publisher": {
                 books = find.findByPublisher(searchValue);
                 break;
             }
-            case "Author":{
+            case "Author": {
                 books = find.findByAuthor(searchValue);
                 break;
             }
-            case "PubYear":{
+            case "PubYear": {
                 books = find.findByPubYear(searchValue);
                 break;
             }
         }
+        addBookToRow(books);
     }
 
     public void managmentButtonPressed(ActionEvent event) throws IOException {
@@ -108,6 +118,40 @@ public class MainViewController {
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(loginViewScene);
         window.show();
+    }
+
+    private void addBookToRow(ArrayList<Book> books) {
+        int current_row_books_num = 0;
+        HBox hbox = new HBox();
+        for (Book book : books) {
+            if (current_row_books_num == 0) {
+                hbox = new HBox();
+                hbox.setSpacing(90);
+                searchResultVBox.getChildren().add(hbox);
+            }
+            VBox vbox = new VBox();
+            Label bookTitle = new Label(book.getTitle());
+            Label bookPrice = new Label("" + book.getPrice() + " $");
+            Label bookYear = new Label("" + book.getPublicationYear());
+            Label bookQuantity = new Label("" + book.getQuantity() + " Available");
+            Button add = new Button("Add To Cart");
+            add.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    try {
+                        registeredCustomer.addToShoppingCart(book.getIsbn(), 1, user, book.getIsbn());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            vbox.setPrefSize(80, 50);
+            vbox.getChildren().addAll(bookTitle, bookPrice, bookYear, bookQuantity, add);
+            hbox.getChildren().add(vbox);
+            current_row_books_num++;
+            if (current_row_books_num >= 4)
+                current_row_books_num = 0;
+        }
     }
 
     //todo check if guest/logged (customer/ manager -> show management button)

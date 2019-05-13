@@ -17,7 +17,6 @@
             <Button fx:id="proBtn" layoutX="59.0" layoutY="200.0" mnemonicParsing="false" onAction="#promoteUser" text="Promote User" />
             <Button fx:id="viewBtn" layoutX="63.0" layoutY="251.0" mnemonicParsing="false" onAction="#viewOrders" text="View Orders" />
             <Button fx:id="bookOrdBtn" layoutX="47.0" layoutY="309.0" mnemonicParsing="false" onAction="#viewBookOrders" text="View Book Orders" />
-            <Button fx:id="confBtn" layoutX="57.0" layoutY="353.0" mnemonicParsing="false" onAction="#confirmOrder" text="Confirm Order" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="secondAnchor" layoutX="218.0" prefHeight="400.0" prefWidth="382.0">
@@ -34,7 +33,7 @@
             <TextField fx:id="ninth" layoutX="117.0" layoutY="276.0" visible="false" />
             <ScrollPane fx:id="ordersScrollPane" layoutX="8.0" layoutY="82.0" prefHeight="304.0" prefWidth="363.0" visible="false">
               <content>
-                <AnchorPane fx:id="ordersAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                <VBox fx:id="ordersVBox" minHeight="0.0" minWidth="0.0"/>
               </content>
             </ScrollPane>
             <Button layoutX="353.0" mnemonicParsing="false" onAction="#backPressed" text="&lt;-" />

@@ -1,18 +1,18 @@
 package sample;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Customer {
 
-    User login(String email , String password){ // returns a User Object if null then there is no user
+    User login(String email ,String password) throws SQLException { // returns a User Object if null then there is no user
         User user  = null;
         Statement stmt= null;
+        Connection connection = SQLConnection.getInstance().getConnection();
         try {
-            stmt = SQLConnection.getInstance().getConnection().createStatement();
+            connection.setAutoCommit(false);
+            stmt = connection.createStatement();
             ResultSet rs=stmt.executeQuery("Select * From USER Where email='"+email+"' AND password='"+password+"';");
+            connection.commit();
             if(rs.next()) {
                 user = new User(rs.getInt(1), rs.getString(2), rs.getString(3)
                         , rs.getString(4), rs.getString(5), rs.getString(6)
@@ -20,6 +20,17 @@ public class Customer {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            if (connection != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    connection.rollback();
+                } catch(SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            connection.setAutoCommit(true);
+
         }
         return user;
     }
@@ -59,7 +70,7 @@ public class Customer {
         return true;
     }
 
-     User getUser(String email) {
+    User getUser(String email) {
         String query = "SELECT * FROM USER WHERE EMAIL = '" + email + "';";
         ResultSet rs = null;
         User user  = null;

@@ -5,11 +5,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class RegisteredCustomer {
-   private ArrayList<CartItem> shoppingCart = new ArrayList<>();
+    private ArrayList<CartItem> shoppingCart = new ArrayList<>();
 
-    boolean editPersonalInfo(User user){
+    boolean editPersonalInfo(User user) throws SQLException {
+        Connection conc = SQLConnection.getInstance().getConnection();
         try {
-            PreparedStatement pstmt = SQLConnection.getInstance().getConnection().prepareStatement(
+            conc.setAutoCommit(false);
+            conc.commit();
+            PreparedStatement pstmt = conc.prepareStatement(
                     "UPDATE USER SET USER_NAME = ?, EMAIL = ?, FNAME = ?, LNAME = ?, " +
                             "PASSWORD = ?, PHONE_NUMBER = ?, SHIPPING_ADDRESS = ?, IS_MANAGER = ? WHERE USER_ID = ?;");
             pstmt.setString(1, user.getUserName());
@@ -25,13 +28,30 @@ public class RegisteredCustomer {
                 return true;
         } catch(Exception e){
             System.out.println(e);
+            if (conc != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    conc.rollback();
+                } catch(SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            conc.setAutoCommit(true);
+
         }
         return false;
     }
 
-    boolean addToShoppingCart(String isbn, int quantity, User user, String orderID)throws SQLException {
+    String getRandomOrderID() throws SQLException {
+        String query ="select substr(concat(md5(rand()),md5(rand())),1,29);";
+        ResultSet rs = SQLConnection.getInstance().getData(query);
+        rs.next();
+        return rs.getString(1);
+    }
+    boolean addToShoppingCart(String isbn, int quantity, User user, String orderID)throws SQLException{
         String query = "SELECT PRICE, QUANTITY FROM BOOK" +
-                "WHERE ISBN ='" + isbn + "';";
+                " WHERE ISBN ='" + isbn + "';";
         ResultSet rs = SQLConnection.getInstance().getData(query);
         if (rs.next()){
             int quantity1 = 0;
@@ -51,6 +71,7 @@ public class RegisteredCustomer {
                 } else {
                     CartItem cartItem = new CartItem(orderID, user.getUserID(), isbn, quantity, price);
                     shoppingCart.add(cartItem);
+
                 }
             } else {
                 return false;
@@ -78,8 +99,8 @@ public class RegisteredCustomer {
     float viewTotalPriceInCart(){
         float price = 0;
         for (int i = 0; i < shoppingCart.size(); i++) {
-           int quantity = shoppingCart.get(i).getQuantity();
-           price += quantity * shoppingCart.get(i).getPrice();
+            int quantity = shoppingCart.get(i).getQuantity();
+            price += quantity * shoppingCart.get(i).getPrice();
         }
         return price;
     }
@@ -98,9 +119,9 @@ public class RegisteredCustomer {
         shoppingCart.clear();
     }
 
-    boolean checkOutCart(){
+    boolean checkOutCart()throws SQLException{
+        Connection conc = SQLConnection.getInstance().getConnection();
         try {
-            Connection conc = SQLConnection.getInstance().getConnection();
             conc.setAutoCommit(false);
             Statement stat = conc.createStatement();
             LocalDate currentDate = LocalDate.now();
@@ -110,19 +131,20 @@ public class RegisteredCustomer {
                 String isbn = shoppingCart.get(i).getIsbn();
                 int quantity = shoppingCart.get(i).getQuantity();
                 String query = "UPDATE BOOK SET QUANTITY = QUANTITY -" + String.valueOf(quantity) +
-                        "WHERE ISBN ='" + isbn + "';";
+                        " WHERE ISBN ='" + isbn + "';";
                 stat.executeUpdate(query);
                 String testQuery = "SELECT USER_ID, ISBN FROM SHOPPING_CART NATURAL JOIN CART_ITEMS WHERE USER_ID =" +
-                        String.valueOf(shoppingCart.get(i).getUserID()) + "AND ISBN = '" + isbn + "';";
+                        String.valueOf(shoppingCart.get(i).getUserID()) +" AND ORDER_ID = '" + shoppingCart.get(i).getOrderID()
+                        + "' AND ISBN = '" + isbn + "';";
                 if (stat.executeQuery(testQuery).next()){
                     String query1 = "UPDATE CART_ITEMS SET QUANTITY = QUANTITY +" + String.valueOf(quantity) +
-                            "WHERE ORDER_ID = '" + shoppingCart.get(i).getOrderID() + "' AND ISBN = '" + isbn + "';";
+                            " WHERE ORDER_ID = '" + shoppingCart.get(i).getOrderID() + "' AND ISBN = '" + isbn + "';";
                     stat.executeUpdate(query1);
                 } else {
                     String query1 = "INSERT INTO SHOPPING_CART VALUES ('" + shoppingCart.get(i).getOrderID() + "'," +
-                           shoppingCart.get(i).getUserID() + ",'" + currentDate + "');";
+                            shoppingCart.get(i).getUserID() + ",'" + currentDate + "');";
                     String query2 = "INSERT INTO CART_ITEMS VALUES ('" + shoppingCart.get(i).getOrderID() + "','" + isbn + "',"
-                           + String.valueOf(quantity) + "," + shoppingCart.get(i).getPrice() + ");";
+                            + String.valueOf(quantity) + "," + shoppingCart.get(i).getPrice() + ");";
                     stat.executeUpdate(query1);
                     stat.executeUpdate(query2);
                 }
@@ -132,6 +154,17 @@ public class RegisteredCustomer {
             return true;
         } catch(Exception e){
             System.out.println(e);
+            if (conc != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    conc.rollback();
+                } catch(SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            conc.setAutoCommit(true);
+
         }
         return false;
     }

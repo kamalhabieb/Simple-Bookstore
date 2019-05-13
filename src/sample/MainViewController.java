@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MainViewController {
@@ -97,6 +98,20 @@ public class MainViewController {
         Scene profileViewScene = new Scene(mainViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(profileViewScene);
+        window.show();
+    }
+
+    public void cartButtonPressed(ActionEvent event) throws IOException, SQLException {
+
+        registeredCustomer.addToShoppingCart("ADDDE",12,user,"Sdad");
+        ///////////////////////
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("cartView.fxml"));
+        Parent mainViewParent = (Parent) loader.load();
+        cartViewController cartViewController = loader.getController();
+        cartViewController.initController(registeredCustomer);
+        Scene cartViewScene = new Scene(mainViewParent);
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(cartViewScene);
         window.show();
     }
 

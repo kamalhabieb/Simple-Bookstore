@@ -6,14 +6,25 @@ public class CartItem {
     private int quantity;
     private float price;
     private int userID;
+    private String title;
 
-    public CartItem(String orderID, int userID, String isbn, int quantity, float price) {
+    public CartItem(String orderID, int userID, String isbn, int quantity, float price,String title) {
         this.orderID = orderID;
         this.isbn = isbn;
         this.quantity = quantity;
         this.price = price;
         this.userID = userID;
+        this.title = title;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 
     public String getOrderID() {
         return orderID;

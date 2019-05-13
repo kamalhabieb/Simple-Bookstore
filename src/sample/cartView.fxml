@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.cartViewController">
+   <children>
+      <VBox prefHeight="400.0" prefWidth="600.0">
+         <children>
+            <HBox>
+               <children>
+                  <Button mnemonicParsing="false" onAction="#backPressed" text="&lt;-" />
+                  <Region prefHeight="25.0" prefWidth="334.0" />
+                  <Label fx:id="totalPriceLabel" text="" />
+                  <Region prefHeight="25.0" prefWidth="34.0" />
+                  <Label fx:id="totalQuantityLabel" text="" />
+               </children>
+            </HBox>
+            <ScrollPane prefHeight="375.0" prefWidth="600.0">
+               <content>
+                  <VBox fx:id="cartItemsVbox" />
+               </content>
+            </ScrollPane>
+            <Button mnemonicParsing="false" onAction="#checkourButtonPressed" prefHeight="25.0" prefWidth="600.0" text="Checkout" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

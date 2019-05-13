@@ -5,12 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import net.sf.jasperreports.engine.*;
 
 
 public class Manager {
 
-    boolean addNewBooks(String ISBN, String title, String publicationYear,
-                        String category, String publisher, int threshold, float price, int quantity, String author){
+    boolean addNewBooks(String ISBN,String title,String publicationYear,
+                        String category, String publisher,int threshold,float price, int quantity,String author){
 
 
         //publication year in the format "yyyy-[m]m-[d]d"
@@ -81,7 +82,7 @@ public class Manager {
     // The Manager only updates quantity
     // if false then the new quantity is negative
 
-    boolean modifyExisting(String ISBN, int soldQuantity){
+    boolean modifyExisting(String ISBN,int soldQuantity){
         try {
             PreparedStatement addBook=SQLConnection.getInstance().getConnection().prepareStatement(
                     "UPDATE BOOK SET QUANTITY = Quantity - " +soldQuantity+" WHERE ISBN = '"+ISBN+"' ;");
@@ -102,7 +103,7 @@ public class Manager {
 
     // send book ISBN
 
-    boolean placeOrder(String ISBN, int quantity){
+    boolean placeOrder(String ISBN,int quantity){
         int  ordered=0;
 
         try {
@@ -114,33 +115,33 @@ public class Manager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-            try {
-                Date date = new Date();
-                java.sql.Timestamp ts = new java.sql.Timestamp(date.getTime());
-                if(ordered>0) {
-                    PreparedStatement addOrder = SQLConnection.getInstance().getConnection().prepareStatement(
-                            "UPDATE BOOK_ORDER SET QUANTITY = ?,CHECKOUT_TIME = ? WHERE ISBN = ?");
-                    addOrder.setString(3, ISBN);
-                    addOrder.setInt(1, quantity + ordered);
-                    addOrder.setTimestamp(2, ts);
-                    if (addOrder.execute()) {
-                        return false;
-                    }
+        try {
+            Date date = new Date();
+            java.sql.Timestamp ts = new java.sql.Timestamp(date.getTime());
+            if(ordered>0) {
+                PreparedStatement addOrder = SQLConnection.getInstance().getConnection().prepareStatement(
+                        "UPDATE BOOK_ORDER SET QUANTITY = ?,CHECKOUT_TIME = ? WHERE ISBN = ?");
+                addOrder.setString(3, ISBN);
+                addOrder.setInt(1, quantity + ordered);
+                addOrder.setTimestamp(2, ts);
+                if (addOrder.execute()) {
+                    return false;
                 }
-                else{
-                    PreparedStatement addOrder = SQLConnection.getInstance().getConnection().prepareStatement(
-                            "INSERT INTO BOOK_ORDER VALUES (?,?,?,?)");
-                    addOrder.setString(1, ISBN);
-                    addOrder.setString(2, ISBN);
-                    addOrder.setInt(3, quantity + ordered);
-                    addOrder.setTimestamp(4, ts);
-                    if (addOrder.execute()) {
-                        return false;
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+            else{
+                PreparedStatement addOrder = SQLConnection.getInstance().getConnection().prepareStatement(
+                        "INSERT INTO BOOK_ORDER VALUES (?,?,?,?)");
+                addOrder.setString(1, ISBN);
+                addOrder.setString(2, ISBN);
+                addOrder.setInt(3, quantity + ordered);
+                addOrder.setTimestamp(4, ts);
+                if (addOrder.execute()) {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }
@@ -148,20 +149,7 @@ public class Manager {
     //gets order, if found add quantity to book quantity, delete order (accepted)
 
     boolean confirmOrder(String orderId){
-        String ISBN = "";
-        int quantity =0;
         try {
-            Statement stmt = SQLConnection.getInstance().getConnection().createStatement();
-            ResultSet rs= stmt.executeQuery("Select ISBN,QUANTITY From BOOK_ORDER Where ID = '" +orderId+"' ;");
-            if(rs.next()) {
-                ISBN = rs.getString(1);
-                quantity = rs.getInt(2);
-            }
-            PreparedStatement updateBookQuantity=SQLConnection.getInstance().getConnection().prepareStatement(
-                    "UPDATE BOOK SET QUANTITY = Quantity + " + quantity+" WHERE ISBN = '"+ISBN+"' ;");
-            if(updateBookQuantity.execute()){
-                return false;
-            }
             PreparedStatement deleteBookOrder=SQLConnection.getInstance().getConnection().prepareStatement(
                     "DELETE FROM BOOK_ORDER WHERE ID = '" + orderId +"' ;");
             if(deleteBookOrder.execute()){
@@ -212,20 +200,17 @@ public class Manager {
         return rs;
     }
 
-   /* void createReports() {
-        JasperReport jasperReport;
-
-        {
-            try {
-                jasperReport = JasperCompileManager.compileReport("Total Sales For Books in Previous Month.jrxml");
-                JRDataSource jrDataSource = new JREmptyDataSource();
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, jrDataSource);
-                JasperExportManager.exportReportToPdfFile(jasperPrint, "Total Sales For Books in Previous Month.pdf");
-            } catch (JRException e) {
-                e.printStackTrace();
-            }
+    ResultSet viewUsers(){
+        ResultSet rs = null;
+        try {
+            Statement viewUsers = SQLConnection.getInstance().getConnection().createStatement();
+            rs = viewUsers.executeQuery("SELECT * FROM USER WHERE IS_MANAGER = 0 ;");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    }*/
+        return rs;
+    }
+
 
 
 

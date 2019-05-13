@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class Controller {
 
@@ -25,16 +26,17 @@ public class Controller {
         customer = new Customer();
     }
 
-    public void loginButtonClicked (ActionEvent event) throws IOException {
+    public void loginButtonClicked (ActionEvent event) throws IOException, SQLException {
         login_email = login_email_tf.getText();
         login_password = login_password_tf.getText();
         //todo make the passwordField hidden
         User user = customer.login(login_email,login_password);
+        RegisteredCustomer registeredCustomer = new RegisteredCustomer();
         if (user != null){
             FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
             Parent mainViewParent = (Parent) loader.load();
             MainViewController mainViewController = loader.getController();
-            mainViewController.initController(user);
+            mainViewController.initController(registeredCustomer, user);
             Scene mainViewScene = new Scene(mainViewParent);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(mainViewScene);

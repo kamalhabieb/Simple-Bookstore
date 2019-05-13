@@ -17,6 +17,7 @@
             <Button fx:id="proBtn" layoutX="59.0" layoutY="200.0" mnemonicParsing="false" onAction="#promoteUser" text="Promote User" />
             <Button fx:id="viewBtn" layoutX="63.0" layoutY="251.0" mnemonicParsing="false" onAction="#viewOrders" text="View Orders" />
             <Button fx:id="bookOrdBtn" layoutX="47.0" layoutY="309.0" mnemonicParsing="false" onAction="#viewBookOrders" text="View Book Orders" />
+            <Button fx:id="viewReports" layoutX="77.0" layoutY="355.0" mnemonicParsing="false" onAction="#viewReportPressed" text="Reports" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="secondAnchor" layoutX="218.0" prefHeight="400.0" prefWidth="382.0">
@@ -33,10 +34,13 @@
             <TextField fx:id="ninth" layoutX="117.0" layoutY="276.0" visible="false" />
             <ScrollPane fx:id="ordersScrollPane" layoutX="8.0" layoutY="82.0" prefHeight="304.0" prefWidth="363.0" visible="false">
               <content>
-                <VBox fx:id="ordersVBox" minHeight="0.0" minWidth="0.0"/>
+                <VBox fx:id="ordersVBox" minHeight="0.0" minWidth="0.0" />
               </content>
             </ScrollPane>
             <Button layoutX="353.0" mnemonicParsing="false" onAction="#backPressed" text="&lt;-" />
+            <Button fx:id="topUsers" layoutX="50.0" layoutY="162.0" mnemonicParsing="false" onAction="#getTopUsersReport" text="Top 5 Users" visible="false" />
+            <Button fx:id="topBooks" layoutX="164.0" layoutY="162.0" mnemonicParsing="false" onAction="#getTopBooksReport" text="Top 10 Books" visible="false" />
+            <Button fx:id="topSales" layoutX="272.0" layoutY="162.0" mnemonicParsing="false" onAction="#getTopSalseReport" text="Top Sales" visible="false" />
          </children>
       </AnchorPane>
    </children>

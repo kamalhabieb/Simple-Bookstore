@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -34,8 +33,7 @@ public class MainViewController {
     private FindBooks find;
 
     @FXML
-    private void initialize() {
-        registeredCustomer = new RegisteredCustomer();
+    private void initialize() { ;
         find = new FindBooks();
         searchResultVBox.setSpacing(10);
         search_type_box.setValue("ISBN");
@@ -43,7 +41,8 @@ public class MainViewController {
 
     }
 
-    public void initController(User usr) {
+    public void initController(RegisteredCustomer regCustomer, User usr) {
+        this.registeredCustomer = regCustomer;
         this.user = usr;
         if (user.isManager()) {
             management_button.setVisible(true);
@@ -69,19 +68,19 @@ public class MainViewController {
                 break;
             }
             case "Category": {
-                books = find.findByCategory(searchValue);
+                books = find.findByCategory(searchValue,1);
                 break;
             }
             case "Publisher": {
-                books = find.findByPublisher(searchValue);
+                books = find.findByPublisher(searchValue,1);
                 break;
             }
             case "Author": {
-                books = find.findByAuthor(searchValue);
+                books = find.findByAuthor(searchValue,1);
                 break;
             }
             case "PubYear": {
-                books = find.findByPubYear(searchValue);
+                books = find.findByPubYear(searchValue,1);
                 break;
             }
         }
@@ -92,7 +91,7 @@ public class MainViewController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("ManagerView.fxml"));
         Parent managerViewParent = (Parent) loader.load();
         ManagerViewController managerViewController = loader.getController();
-        managerViewController.initController(user);
+        managerViewController.initController(registeredCustomer,user);
         Scene profileViewScene = new Scene(managerViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(profileViewScene);
@@ -107,6 +106,17 @@ public class MainViewController {
         Scene profileViewScene = new Scene(mainViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(profileViewScene);
+        window.show();
+    }
+
+    public void cartButtonPressed(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("cartView.fxml"));
+        Parent mainViewParent = (Parent) loader.load();
+        cartViewController cartViewController = loader.getController();
+        cartViewController.initController(registeredCustomer,user);
+        Scene cartViewScene = new Scene(mainViewParent);
+        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        window.setScene(cartViewScene);
         window.show();
     }
 
@@ -139,7 +149,8 @@ public class MainViewController {
                 @Override
                 public void handle(ActionEvent event) {
                     try {
-                        registeredCustomer.addToShoppingCart(book.getIsbn(), 1, user, book.getIsbn());
+                        String orderId = registeredCustomer.getRandomOrderID();
+                        registeredCustomer.addToShoppingCart(book.getIsbn(), 1, user,orderId,book.getTitle());
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }

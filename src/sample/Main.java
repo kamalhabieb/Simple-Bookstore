@@ -74,10 +74,10 @@ public class Main extends Application {
             e.printStackTrace();
         }
 
-        ArrayList<Book> books= fb.findByPubYear("2019");
-        for (int i = 0; i < books.size(); i++) {
-            System.out.println(books.get(i).toString());
-        }
+//        ArrayList<Book> books= fb.findByPubYear("2019");
+//        for (int i = 0; i < books.size(); i++) {
+//            System.out.println(books.get(i).toString());
+//        }
 
 //        Customer c = new Customer();
 //        RegisteredCustomer rc = new RegisteredCustomer();

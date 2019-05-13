@@ -38,6 +38,10 @@ public class ManagerViewController {
     public Button viewBtn;
     public Button bookOrdBtn;
     public VBox ordersVBox;
+    public Button topUsers;
+    public Button topBooks;
+    public Button topSales;
+    public Button viewReports;
     boolean addBookReady = false;
     String ISBN;
     String title;
@@ -58,16 +62,22 @@ public class ManagerViewController {
     private boolean bookOrdersReady = false;
     private String bookOrderISBN;
     private boolean viewOrdersReady = false;
+    private boolean viewReportReady = false;
     private Manager manager;
     private int orderQuantity;
     private User user;
-    public void initController(User usr) {
+    private RegisteredCustomer registeredCustomer;
+    private ReportFunctions reportFunctions;
+
+    public void initController(RegisteredCustomer registeredCustomer, User usr) {
+        this.registeredCustomer = registeredCustomer;
         this.user = usr;
     }
 
     @FXML
     private void initialize() {
         manager = new Manager();
+        reportFunctions = new ReportFunctions();
         ordersScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         ordersScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         ordersVBox.setSpacing(5);
@@ -99,6 +109,10 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         } else {
             if (!first.getText().isEmpty() && !second.getText().isEmpty() && !third.getText().isEmpty() && !forth.getText().isEmpty() &&
                     !fifth.getText().isEmpty() && !sixth.getText().isEmpty() && !seventh.getText().isEmpty() && !eighth.getText().isEmpty() && !ninth.getText().isEmpty()) {
@@ -128,7 +142,7 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
-
+            viewReports.setVisible(true);
         }
 
     }
@@ -141,12 +155,15 @@ public class ManagerViewController {
             second.setVisible(true);
             modifyBookReady = true;
             ordersScrollPane.setVisible(false);
-
             addBtn.setVisible(false);
             ordBtn.setVisible(false);
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         } else {
             if (!first.getText().isEmpty() && !second.getText().isEmpty() && !third.getText().isEmpty() && !forth.getText().isEmpty() &&
                     !fifth.getText().isEmpty()) {
@@ -162,6 +179,7 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
+            viewReports.setVisible(true);
         }
     }
 
@@ -179,6 +197,10 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         } else {
             if (!first.getText().isEmpty() && !second.getText().isEmpty()) {
                 orderISBN = first.getText();
@@ -193,6 +215,7 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
+            viewReports.setVisible(true);
         }
     }
 
@@ -212,6 +235,10 @@ public class ManagerViewController {
             viewBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
             ordBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         } else {
             if (!first.getText().isEmpty()) {
                 userId = Integer.parseInt(first.getText());
@@ -224,6 +251,7 @@ public class ManagerViewController {
             viewBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
             ordBtn.setVisible(true);
+            viewReports.setVisible(true);
         }
     }
 
@@ -236,6 +264,10 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             bookOrdBtn.setVisible(false);
             ordBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
             ResultSet resultSet = manager.viewBookOrders();
             ArrayList<OrderInfo> orderInfos = new ArrayList<>();
             while (resultSet.next()) {
@@ -252,6 +284,7 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             bookOrdBtn.setVisible(true);
             ordBtn.setVisible(true);
+            viewReports.setVisible(true);
             ordersVBox.getChildren().clear();
         }
 
@@ -276,7 +309,7 @@ public class ManagerViewController {
         ordersVBox.getChildren().add(hBox);
     }
 
-    public void viewBookOrders() {
+    public void viewBookOrders() throws SQLException {
         if (!bookOrdersReady) {
             first.setPromptText("Book ISBN");
             first.setVisible(true);
@@ -287,10 +320,21 @@ public class ManagerViewController {
             proBtn.setVisible(false);
             viewBtn.setVisible(false);
             ordBtn.setVisible(false);
+            viewReports.setVisible(false);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         } else {
             if (!first.getText().isEmpty()) {
                 bookOrderISBN = first.getText();
                 ResultSet resultSet = manager.viewBookOrder(bookOrderISBN);
+                ArrayList<OrderInfo> orderInfos = new ArrayList<>();
+                while (resultSet.next()) {
+                    OrderInfo orderInfo = new OrderInfo(resultSet.getString(1), resultSet.getString(2)
+                            , resultSet.getInt(3), resultSet.getString(4));
+                    orderInfos.add(orderInfo);
+                    previewOrder(orderInfo);
+                }
             }
             bookOrdersReady = false;
             first.setVisible(false);
@@ -299,6 +343,51 @@ public class ManagerViewController {
             proBtn.setVisible(true);
             viewBtn.setVisible(true);
             ordBtn.setVisible(true);
+            viewReports.setVisible(true);
+        }
+    }
+    
+    public void viewReportPressed(){
+        if (!viewReportReady) {
+            viewReportReady = true;
+            first.setVisible(false);
+            second.setVisible(false);
+            third.setVisible(false);
+            forth.setVisible(false);
+            fifth.setVisible(false);
+            sixth.setVisible(false);
+            seventh.setVisible(false);
+            eighth.setVisible(false);
+            ninth.setVisible(false);
+            modBtn.setVisible(false);
+            ordBtn.setVisible(false);
+            proBtn.setVisible(false);
+            viewBtn.setVisible(false);
+            bookOrdBtn.setVisible(false);
+            addBtn.setVisible(false);
+            topBooks.setVisible(true);
+            topUsers.setVisible(true);
+            topSales.setVisible(true);
+        }else{
+            viewReportReady = false;
+            first.setVisible(false);
+            second.setVisible(false);
+            third.setVisible(false);
+            forth.setVisible(false);
+            fifth.setVisible(false);
+            sixth.setVisible(false);
+            seventh.setVisible(false);
+            eighth.setVisible(false);
+            ninth.setVisible(false);
+            modBtn.setVisible(true);
+            ordBtn.setVisible(true);
+            proBtn.setVisible(true);
+            viewBtn.setVisible(true);
+            bookOrdBtn.setVisible(true);
+            addBtn.setVisible(true);
+            topBooks.setVisible(false);
+            topUsers.setVisible(false);
+            topSales.setVisible(false);
         }
     }
 
@@ -306,10 +395,22 @@ public class ManagerViewController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
         Parent mainViewParent = (Parent) loader.load();
         MainViewController mainViewController = loader.getController();
-        mainViewController.initController(user);
+        mainViewController.initController(registeredCustomer, user);
         Scene mainViewScene = new Scene(mainViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainViewScene);
         window.show();
+    }
+
+    public void getTopUsersReport(){
+        reportFunctions.getTopFiveUsers();
+    }
+
+    public void getTopBooksReport(){
+        reportFunctions.getTopTenBooks();
+    }
+
+    public void getTopSalseReport(){
+        reportFunctions.getTopSales();
     }
 }

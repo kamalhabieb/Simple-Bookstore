@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ProfileViewController {
 
@@ -56,7 +57,7 @@ public class ProfileViewController {
         passwordField.setEditable(true);
     }
 
-    public void confirmPressed() {
+    public void confirmPressed() throws SQLException {
         String newUsrName = usr_name.getText();
         String newFName = f_name.getText();
         String newLName = l_name.getText();
@@ -97,7 +98,7 @@ public class ProfileViewController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
         Parent mainViewParent = (Parent) loader.load();
         MainViewController mainViewController = loader.getController();
-        mainViewController.initController(user);
+        mainViewController.initController(registeredCustomer, user);
         Scene mainViewScene = new Scene(mainViewParent);
         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
         window.setScene(mainViewScene);

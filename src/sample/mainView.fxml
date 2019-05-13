@@ -13,11 +13,12 @@
          <children>
             <HBox>
                <children>
-                  <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#profileButtonPressed" prefHeight="25.0" prefWidth="65.0" text="Profile" />
-                  <Button fx:id="management_button" mnemonicParsing="false" onAction="#managmentButtonPressed" prefHeight="25.0" prefWidth="71.0" text="manage" />
+                  <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#profileButtonPressed" prefHeight="25.0" prefWidth="53.0" text="Profile" />
+                  <Button fx:id="management_button" mnemonicParsing="false" onAction="#managmentButtonPressed" prefHeight="25.0" prefWidth="65.0" text="manage" />
                   <TextField fx:id="search_box" alignment="CENTER" prefHeight="25.0" prefWidth="239.0" promptText="Search" />
                   <ChoiceBox fx:id="search_type_box" prefHeight="25.0" prefWidth="96.0" />
-                  <Button fx:id="search_button" mnemonicParsing="false" onAction="#searchButtonPressed" prefHeight="25.0" prefWidth="70.0" text="Search" />
+                  <Button fx:id="search_button" mnemonicParsing="false" onAction="#searchButtonPressed" prefHeight="25.0" prefWidth="55.0" text="Search" />
+                  <Button mnemonicParsing="false" onAction="#cartButtonPressed" text="Cart" />
                   <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#logoutButtonPressed" text="Log Out" />
                </children>
             </HBox>

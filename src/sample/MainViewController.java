@@ -27,10 +27,10 @@ public class MainViewController {
     public Button profileBtn;
     public Button logoutBtn;
     public VBox searchResultVBox;
-
     private User user;
     private RegisteredCustomer registeredCustomer;
     private FindBooks find;
+    private int offset =1;
 
     @FXML
     private void initialize() { ;
@@ -68,19 +68,19 @@ public class MainViewController {
                 break;
             }
             case "Category": {
-                books = find.findByCategory(searchValue,1);
+                books = find.findByCategory(searchValue,offset);
                 break;
             }
             case "Publisher": {
-                books = find.findByPublisher(searchValue,1);
+                books = find.findByPublisher(searchValue,offset);
                 break;
             }
             case "Author": {
-                books = find.findByAuthor(searchValue,1);
+                books = find.findByAuthor(searchValue,offset);
                 break;
             }
             case "PubYear": {
-                books = find.findByPubYear(searchValue,1);
+                books = find.findByPubYear(searchValue,offset);
                 break;
             }
         }
@@ -165,5 +165,16 @@ public class MainViewController {
         }
     }
 
+    public void loadNextPage(){
+        offset++;
+        searchButtonPressed();
+    }
+
+    public void loadPrevPage(){
+        if (offset>1){
+            offset--;
+            searchButtonPressed();
+        }
+    }
     //todo check if guest/logged (customer/ manager -> show management button)
 }

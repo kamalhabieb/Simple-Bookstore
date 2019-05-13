@@ -27,6 +27,13 @@
                 <VBox fx:id="searchResultVBox" minHeight="0.0" minWidth="0.0" />
               </content>
             </ScrollPane>
+            <HBox>
+               <children>
+                  <Region prefHeight="25.0" prefWidth="267.0" />
+                  <Button mnemonicParsing="false" onAction="#loadPrevPage" text="&lt;-" />
+                  <Button mnemonicParsing="false" onAction="#loadNextPage" text="-&gt;" />
+               </children>
+            </HBox>
          </children>
       </VBox>
    </children>

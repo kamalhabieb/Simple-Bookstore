@@ -193,4 +193,23 @@ public class RegisteredCustomer {
         }
         return false;
     }
+
+    void increaseQuantityOfCartItem(CartItem cartItem){
+        cartItem.setPrice((cartItem.getPrice()/cartItem.getQuantity())*(cartItem.getQuantity()+1));
+        cartItem.setQuantity(cartItem.getQuantity()+1);
+    }
+
+    void decreaseQuantityOfCartItem(CartItem cartItem){
+        if(cartItem.getQuantity()==1){
+            for (int i = 0; i < shoppingCart.size(); i++) {
+                if (shoppingCart.get(i).getIsbn().matches(cartItem.getIsbn())){
+                    shoppingCart.remove(i);
+                }
+            }
+        }
+        else {
+            cartItem.setPrice((cartItem.getPrice() / cartItem.getQuantity()) * (cartItem.getQuantity() + 1));
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package sample;
 
+import java.sql.SQLException;
+
 public class cartViewController {
 
     private RegisteredCustomer regCustomer;
@@ -8,7 +10,7 @@ public class cartViewController {
         this.regCustomer = registeredCustomer;
     }
 
-    public void checkourButtonPressed(){
+    public void checkourButtonPressed() throws SQLException {
         boolean valid = regCustomer.checkOutCart();
         System.out.println(valid);
         if (!valid){
